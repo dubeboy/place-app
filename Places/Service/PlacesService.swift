@@ -27,9 +27,7 @@ final class PlacesService {
     private static let baseURL = URL(string: "https://raw.githubusercontent.com/")
     static let shared = PlacesService()
 
-    private init() {
-
-    }
+    private init() {}
 
     func makeRequest<T: Decodable>(_ endpoint: EndpointProtocol, for response: T.Type) async throws -> T {
         let request = makeRequest(for: endpoint)
