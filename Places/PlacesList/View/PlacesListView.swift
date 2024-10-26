@@ -22,10 +22,30 @@ struct PlacesListView: View {
     @StateObject var viewModel: PlacesListViewModel = .init()
 
     var body: some View {
+        ZStack {
+            switch viewModel.state {
+            case .loaded:
+                mainView
+            case .loading:
+                ProgressView()
+            case .failed:
+                FailedToLoadErrorView(strings: strings) {
+                    await viewModel.fetchPlacesList()
+                }
+            }
+        }
+        .task {
+            await viewModel.fetchPlacesList()
+        }
+    }
+
+    var mainView: some View {
         NavigationStack {
             List {
                 ForEach(viewModel.searchResult) { place in
-                    PlaceItem(name: place.name)
+                    PlaceItem(name: place.name) {
+                        viewModel.didTapItem(place)
+                    }
                 }
             }
             .navigationTitle(strings.title)
@@ -35,39 +55,43 @@ struct PlacesListView: View {
             )
             .textInputAutocapitalization(.never)
         }
-        .task {
-            await viewModel.fetchPlacesList()
-        }
     }
 }
 
 struct PlaceItem: View {
     let name: String
+    let action: () -> Void
     var body: some View {
-        VStack {
-            Text(name)
+        Button(action: action) {
+            VStack { // Lat and Long are not useful information to humans in most cases
+                Text(name)
+            }
         }
     }
 }
 
 struct FailedToLoadErrorView: View {
     let strings: PlacesListView.Strings // Add this to environment
-    let retryAction: () -> Void
+    let retryAction: () async -> Void
 
     var body: some View {
         VStack {
             Image(systemName: "exclamationmark.octagon")
                 .imageScale(.large)
                 .foregroundStyle(.red)
+                .accessibilityLabel("exclamationmark octagon")
             Text(strings.errorTitle)
                 .font(.headline)
             Text(strings.errorBody)
                 .font(.subheadline)
             Button(strings.retryButtonTitle) {
-                retryAction()
+                Task {
+                    await retryAction()
+                }
             }
         }
         .padding()
+        .accessibilityElement(children: .combine)
     }
 }
 

@@ -11,7 +11,7 @@ import Combine
 class PlacesListViewModel: ObservableObject {
 
     struct Constants {
-        static let noName = "---NO NAME---"
+        static let noName = "Unknown"
     }
 
     enum State {
@@ -33,6 +33,7 @@ class PlacesListViewModel: ObservableObject {
 
     @MainActor
     func fetchPlacesList() async {
+        state = .loading
         do {
             let response = try await usecase.fetchPlacesList()
             self.model = placesListModel(response)
@@ -41,6 +42,10 @@ class PlacesListViewModel: ObservableObject {
         } catch {
             state = .failed
         }
+    }
+
+    func didTapItem(_ place: PlacesListModel) {
+        // Open wiki
     }
 
     private func observeSearchQuery() {
