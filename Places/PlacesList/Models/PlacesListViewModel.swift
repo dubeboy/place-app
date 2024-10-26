@@ -6,3 +6,7 @@
 //
 
 import Foundation
+
+class PlacesListViewModel: ObservableObject {
+    var locationResponse: PlacesResponse?
+}
