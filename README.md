@@ -2,7 +2,7 @@
 
 The **Places App** is a SwiftUI application that displays a list of places around the world. Users can tap on a place to be redirected to the Wikipedia app for more information about that location under the Places tab
 
-## Archecture
+## Architecture
 
 The app follows the common SwiftUI **Model-View (MV)** architecture:
 
