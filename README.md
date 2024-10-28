@@ -11,6 +11,7 @@ The app follows the common SwiftUI **Model-View (MV)** architecture:
 - **ViewModel**: Acts as the central place for all the business logic, handling data transformations, validations, state management, and network requests/ aggreegation /caching using the use case . Each screen or feature has a dedicated ViewModel, like `PlacesListViewModel`.
 
 ## File Structure
+```md
 .
 ├── Places
 │   ├── PlacesApp.swift
@@ -31,6 +32,7 @@ The app follows the common SwiftUI **Model-View (MV)** architecture:
 ├── PlacesTests
 │   └── PlacesTests.swift
 ├── README.md
+```
 
 - **PlacesList**: Contains the Places Screen/Feature each subsequent screen/feature will have this file struture define in this directory
   - **Models**: Defines the ViewModel and the DTO and @State Models used by the view/views of this feature.
