@@ -7,6 +7,7 @@
 
 import Foundation
 import Combine
+import UIKit
 
 class PlacesListViewModel: ObservableObject {
 
@@ -24,10 +25,11 @@ class PlacesListViewModel: ObservableObject {
     @Published var state: State = .loading
     @Published var searchQuery: String = ""
 
-    private let usecase = PlacesListUseCase()
+    private let usecase: PlacesListUseCase
     private var cancellables = Set<AnyCancellable>()
 
-    init() {
+    init(usecase: PlacesListUseCase = PlacesListUseCase()) {
+        self.usecase = usecase
         observeSearchQuery()
     }
 
@@ -45,7 +47,9 @@ class PlacesListViewModel: ObservableObject {
     }
 
     func didTapItem(_ place: PlacesListModel) {
-        // Open wiki
+        if let url = URL(string: "https://en.wikipedia.org/wiki/\(place.name)?WMFPage=Places&lat=\(place.lat)&lon=\(place.long)") {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        }
     }
 
     private func observeSearchQuery() {

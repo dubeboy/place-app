@@ -27,7 +27,7 @@ final class PlacesListService {
 
 // In the use case we can cache and decide
 // if we are going to fetch the data from network or from local storage like core data
-final class PlacesListUseCase {
+class PlacesListUseCase {
     let service = PlacesListService.shared
 
     func fetchPlacesList() async throws -> PlacesResponse {
