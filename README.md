@@ -34,8 +34,8 @@ The app follows the common SwiftUI **Model-View (MV)** architecture:
 
 - **PlacesList**: Contains the Places Screen/Feature each subsequent screen/feature will have this file struture define in this directory
   - **Models**: Defines the ViewModel and the DTO and @State Models used by the view/views of this feature.
-  - **UseCase**: This is where we decide we decide where we going to fetch our data from, there might be a per service class, it also defines a "declarative" way in which we fetch data from the server in which we simply specify the URL and HTTP menthod.
-  - **View**: This will contain the main SwiftUI View some component view that will eventually be used by the main swiftUI View.
+  - **UseCase**: This is where we decide we decide where we are going to fetch our data from. It also defines a "declarative" way in which we fetch data from the server in which we simply specify the URL and HTTP menthod.
+  - **View**: This will contain the main SwiftUI View some components view that will eventually be used by the main swiftUI View.
 - **Service**: This contains the service class that will be used by all screens in our app to easily make network calls this will/can handle authentication and appending the approriate headers.
 - **Tests**: Unit tests for the app, testing the viewModel
 
