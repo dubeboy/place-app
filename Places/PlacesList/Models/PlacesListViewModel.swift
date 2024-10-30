@@ -46,10 +46,14 @@ class PlacesListViewModel: ObservableObject {
         }
     }
 
-    func didTapItem(_ place: PlacesListModel) {
-        if let url = URL(string: "https://en.wikipedia.org/wiki/\(place.name)?WMFPage=Places&lat=\(place.lat)&lon=\(place.long)") {
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+    @discardableResult
+    func didTapItem(_ place: PlacesListModel) -> URL? {
+        guard let url = URL(string: "https://en.wikipedia.org/wiki/\(place.name)?WMFPage=Places&lat=\(place.lat)&lon=\(place.long)")
+        else {
+            return nil
         }
+        UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        return url
     }
 
     private func observeSearchQuery() {
