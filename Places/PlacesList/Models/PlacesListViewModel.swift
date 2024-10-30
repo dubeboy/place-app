@@ -8,20 +8,25 @@
 import Foundation
 import Combine
 import UIKit
+import SwiftUI
+import MapKit
 
 class PlacesListViewModel: ObservableObject {
 
     struct Constants {
-        static let noName = "Unknown"
+        static let noName = "Unknown-\(UUID().uuidString.prefix(3))" // to bypass the caching in the wikipedia app in case we have many `unknown` place
     }
 
-    enum State {
-        case loaded, loading, failed
+    enum LoadedAndSearching {
+        case searching, idle
     }
 
-    private var locationResponse: PlacesResponse?
+    enum State: Equatable {
+        case loaded(LoadedAndSearching), loading, failed // we compose states so that we don't end up with too many boolean variables that are hard to trace
+    }
+
     private var model: [PlacesListModel] = []
-    @Published var searchResult: [PlacesListModel] = []
+    @Published var searchResults: [PlacesListModel] = []
     @Published var state: State = .loading
     @Published var searchQuery: String = ""
 
@@ -38,9 +43,9 @@ class PlacesListViewModel: ObservableObject {
         state = .loading
         do {
             let response = try await usecase.fetchPlacesList()
-            self.model = placesListModel(response)
-            self.searchResult = model
-            state = .loaded
+            self.model = placesListModel(response.locations)
+            self.searchResults = model
+            state = .loaded(.idle)
         } catch {
             state = .failed
         }
@@ -58,19 +63,39 @@ class PlacesListViewModel: ObservableObject {
 
     private func observeSearchQuery() {
         $searchQuery
+            .debounce(for: .milliseconds(500), scheduler: DispatchQueue.main)
             .sink { [weak self] query in
                 guard let self else { return }
-
-                if query.isEmpty { return self.searchResult = self.model }
-                self.searchResult = model.filter { place in
-                    place.name.lowercased().contains(query.lowercased())
+                state = .loaded(.searching)
+                if query.isEmpty {
+                    self.searchResults = self.model
+                    state = .loaded(.idle)
+                    return
+                }
+                Task { [weak self] in
+                    guard let self else { return }
+                    let mapsSearchResults = await self.fetchUserCustomLocations(query: query)
+                    await MainActor.run {
+                        self.searchResults = mapsSearchResults
+                        self.state = .loaded(.idle)
+                    }
                 }
             }
             .store(in: &cancellables)
     }
 
-    private func placesListModel(_ response: PlacesResponse) -> [PlacesListModel]  {
-        response.locations.compactMap {
+    private func fetchUserCustomLocations(query: String) async -> [PlacesListModel] {
+        let request = MKLocalSearch.Request()
+        request.naturalLanguageQuery = query
+        let search = MKLocalSearch(request: request)
+        guard let response = try? await search.start() else { return [] }
+        return response.mapItems.map {
+            PlacesListModel(name: $0.name ?? Constants.noName, lat: $0.placemark.coordinate.latitude, long: $0.placemark.coordinate.longitude)
+        }
+    }
+
+    private func placesListModel(_ locations: [Location]) -> [PlacesListModel]  {
+        locations.compactMap {
             guard let lat = $0.lat, let long = $0.long else { return nil }
             return .init(name: $0.name ?? Constants.noName, lat: lat, long: long)
         }

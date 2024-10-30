@@ -28,7 +28,7 @@ final class PlacesListViewModelTests: XCTestCase {
 
     func testInitialState() {
         XCTAssertEqual(viewModel.state, .loading)
-        XCTAssertTrue(viewModel.searchResult.isEmpty)
+        XCTAssertTrue(viewModel.searchResults.isEmpty)
         XCTAssertEqual(viewModel.searchQuery, "")
     }
 
@@ -40,8 +40,8 @@ final class PlacesListViewModelTests: XCTestCase {
 
         await viewModel.fetchPlacesList()
 
-        XCTAssertEqual(viewModel.state, .loaded)
-        XCTAssertEqual(viewModel.searchResult, mockPlaces)
+        XCTAssertEqual(viewModel.state, .loaded(.idle))
+        XCTAssertEqual(viewModel.searchResults, mockPlaces)
     }
 
     func testFetchPlacesListFailure() async {
@@ -50,7 +50,7 @@ final class PlacesListViewModelTests: XCTestCase {
         await viewModel.fetchPlacesList()
 
         XCTAssertEqual(viewModel.state, .failed)
-        XCTAssertTrue(viewModel.searchResult.isEmpty)
+        XCTAssertTrue(viewModel.searchResults.isEmpty)
     }
 
     func testDidTapItemURLFormation() {
@@ -82,10 +82,3 @@ final class MockPlacesListUseCase: PlacesListUseCase {
         ])
     }
 }
-
-extension PlacesListModel: @retroactive Equatable {
-    public static func == (lhs: PlacesListModel, rhs: PlacesListModel) -> Bool {
-        return lhs.name == rhs.name && lhs.lat == rhs.lat && lhs.long == rhs.long
-    }
-}
-

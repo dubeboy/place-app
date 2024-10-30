@@ -11,7 +11,7 @@ struct PlacesResponse: Decodable {
     let locations: [Location]
 }
 
-struct Location: Decodable {
+struct Location: Decodable, Hashable {
     let name: String?
     // For resilience I like to keep my encodable properties nullable so that
     // we do not crash the whole app in the case on field is null

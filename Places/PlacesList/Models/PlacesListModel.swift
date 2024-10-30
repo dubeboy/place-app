@@ -7,8 +7,10 @@
 
 import Foundation
 
-struct PlacesListModel: Identifiable {
-    let id: UUID = UUID()
+struct PlacesListModel: Identifiable, Hashable {
+    var id: String {
+        "\(lat),\(long)" // the most true representation of a place is latitude and longitude
+    }
 
     let name: String
     let lat: Double

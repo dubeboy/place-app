@@ -41,8 +41,11 @@ struct PlacesListView: View {
 
     var mainView: some View {
         NavigationStack {
+            if case let .loaded(isSearching) = viewModel.state, isSearching == .searching {
+                ProgressView()
+            }
             List {
-                ForEach(viewModel.searchResult) { place in
+                ForEach(viewModel.searchResults) { place in
                     PlaceItem(name: place.name) {
                         viewModel.didTapItem(place)
                     }
